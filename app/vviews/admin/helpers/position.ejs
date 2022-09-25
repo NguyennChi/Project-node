@@ -1,0 +1,16 @@
+<% 
+    positionHelper = (collection, position, id) => {
+        let xhtmlPosition = '';
+        let link       = systemConfig.prefixAdmin + '/' + collection + '/ajax/position' ;
+        if(position === "topPost") {
+            xhtmlPosition = 'btn-success';
+        }else if (position === "normal") {
+            xhtmlPosition = 'btn-warning';
+        }
+        return `<a href="javascript:void(0)" class="rounded-circle btn btn-sm ${xhtmlPosition} position" onClick="handleAjax('${linkAjax}','position','${id}',this)" data-value="${position}"><i class=""></i>${position}</a>`;
+    }
+%>
+
+
+
+
