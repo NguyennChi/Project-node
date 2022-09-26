@@ -1,3 +1,5 @@
+const { locale } = require("dayjs");
+
 const Collection = 'sliders';
 const Model = require(__path_schemas + Collection);
 const FileHelpers = require(__path_helpers + 'file');
