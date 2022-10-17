@@ -3,6 +3,7 @@ $(document).ready(function () {
     var ckbAll = $(".cbAll");
     //check all
     ckbAll.click(function () {
+        console.log(123);
         $('input:checkbox').not(this).prop('checked', this.checked);
         if ($(this).is(':checked')) {
             $(".ordering").attr("name", "ordering");

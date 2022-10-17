@@ -24,10 +24,10 @@ global.__path_models     = __path_app + pathConfig.folder_models + '/';
 global.__path_helpers   = __path_app + pathConfig.folder_helpers + '/';
 global.__path_routers   = __path_app + pathConfig.folder_routers + '/';
 global.__path_schemas   = __path_app + pathConfig.folder_schemas + '/';
-global.__path_validates = __path_app + pathConfig.folder_validates + '/';
+// global.__path_validates = __path_app + pathConfig.folder_validates + '/';
 global.__path_views     = __path_app + pathConfig.folder_views + '/';
 global.__path_view_admin     = __path_views + pathConfig.folder_module_admin + '/';
-global.__path_view_news      = __path_views + pathConfig.folder_module_news + '/';
+// global.__path_view_news      = __path_views + pathConfig.folder_module_news + '/';
 global.__path_public      = __base + pathConfig.folder_public + '/';
 global.__path_uploads     = __path_public + pathConfig.folder_uploads + '/';
 
@@ -43,15 +43,17 @@ app.use(session({
   secret: 'abcnhds',
   resave: false,
   saveUninitialized: true}
-));
+  ));
+
 app.use(flash(app, {
-   viewName: __path_view_admin + 'elements/notify',
- }));
- 
+  viewName: __path_view_admin + 'html/notify',
+}));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
+
 // app.set('layout', __path_views + 'backend');
 app.set('layout', __path_view_admin + 'admin');
 
@@ -64,8 +66,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.locals.systemConfig = systemConfig;
 app.locals.dayjs = dayjs;
 // Setup router
+//app.use(`/adminCCC}`, require(router/backend/index));
+
 app.use(`/${systemConfig.prefixAdmin}`, require(__path_routers + 'backend/index'));
-app.use('/', require(__path_routers + 'frontend/index'));
+// app.use('/', require(__path_routers + 'frontend/index'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

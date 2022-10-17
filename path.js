@@ -5,10 +5,10 @@ module.exports = {
     folder_helpers   : 'helpers',
     folder_routers   : 'routes',
     folder_schemas   : 'schemas',
-    folder_validates : 'validates',
+    // folder_validates : 'validates',
     folder_views     : 'vviews',
     folder_module_admin : 'admin',
-    folder_module_news  : 'news',
+    // folder_module_news  : 'news',
     folder_models    : 'models',
     folder_public    : 'public',
     folder_uploads   : 'uploads'

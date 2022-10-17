@@ -4,7 +4,7 @@
         if(imageName == null){ 
             imageName = 'no-avatar.png';
         }
-        return `<img class="img-thumbnail" src="${folder + imageName}" alt="${alt}" width=${width} style="object-fit: cover;height:${height}px;" id="showImage" onerror="notImage(this,'${folder}')" />`;
+        return `<img class="img-thumbnail" src="${folder + imageName}" alt="${alt}" width=${width} style="object-fit:cover;" id="showImage" onerror="notImage(this,'${folder}')" />`;
     }
 %>
 

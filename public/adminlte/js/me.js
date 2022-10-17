@@ -23,7 +23,6 @@ $(document).ready(function () {
            
             $(".ordering").removeAttr("name");
         }
-        
     });
     // hiden notify
     hiddenNotify(".close-btn");
@@ -61,8 +60,7 @@ $(document).ready(function () {
 
         $(slb_selector).on("change", function () {
             optValue = $(this).val();
-            
-            
+            console.log(cbAll);
             if(optValue !== "") {
                 $(id_btn_action).removeAttr('disabled');
             } else {

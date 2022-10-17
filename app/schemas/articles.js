@@ -7,7 +7,6 @@ var schema = new mongoose.Schema({
     thumbnail: String, 
     description: String,
     status: String,
-    position:String,
     ordering: Number,
     categoriesId: { 
         type: mongoose.Schema.Types.ObjectId, 

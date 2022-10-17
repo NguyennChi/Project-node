@@ -128,9 +128,17 @@ router.get(('/form(/:id)?'),async (req, res, next) => {
 // SAVE = ADD EDIT
 router.post('/save',
 	body('name').notEmpty().withMessage(notify.ERROR_NAME_EMPTY),
-	body('parentId').not().isIn(['novalue']).withMessage(notify.ERROR_Category),
+	body('parentId').not().isIn(['novalue']).withMessage(notify.ERROR_Category).custom((value,{req}) => {
+		const {id, name} = req.body;
+		if(id) {
+			return Model.findById(id).select('id').then(item => {
+				if(item.id == value) return Promise.reject('Vui lòng chọn parent khác '+name)
+			})
+		}
+		return true;
+	}),
 	body('slug').matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).withMessage(notify.ERROR_SLUG),
-	body('ordering').isNumeric().withMessage(notify.ERROR_ORDERING),
+	body('ordering').isNumeric().isInt({ gt:0}).withMessage(notify.ERROR_ORDERING),
 	body('status').not().isIn(['novalue']).withMessage(notify.ERROR_STATUS),
 	async (req, res, next) => {
 		const errors = validationResult(req);

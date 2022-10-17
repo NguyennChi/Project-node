@@ -8,6 +8,7 @@ const Collection = 'articles';
 const systemConfig  = require(__path_configs + 'system');
 const notify  		= require(__path_configs + 'notify');
 const Model 		= require(__path_models + Collection);
+const SlidersModel 	= require(__path_schemas + Collection);
 const UtilsHelpers 	= require(__path_helpers + 'utils');
 const ParamsHelpers = require(__path_helpers + 'params');
 const FileHelpers = require(__path_helpers + 'file');
@@ -28,7 +29,7 @@ router.get('(/status/:status)?', async (req, res, next) => {
 	let listCategory = await UtilsHelpers.getCategory();
 	let pagination 	 = {
 		totalItems		 : 1,
-		totalItemsPerPage: 4,
+		totalItemsPerPage: 10,
 		currentPage		 : parseInt(ParamsHelpers.getParam(req.query, 'page', 1)),
 		pageRanges		 : 3
 	};
@@ -77,6 +78,22 @@ router.get('/sort/:field/:type', (req, res, next) => {
 	req.session.sortType = req.params.type;
 	res.redirect(linkIndex)
 });
+// Change ordering - Multi
+// router.post('/change-ordering', (req, res, next) => {
+// 	let cids 		= req.body.cid;
+// 	let orderings 	= req.body.ordering;
+	
+// 	if(Array.isArray(cids)) {
+// 		cids.forEach((item, index) => {
+// 			SlidersModel.updateOne({_id: item}, {ordering: parseInt(orderings[index])}, (err, result) => {});
+// 		})
+// 	}else{ 
+// 		SlidersModel.updateOne({_id: cids}, {ordering: parseInt(orderings)}, (err, result) => {});
+// 	}
+
+// 	req.flash('success', notify.CHANGE_ORDERING_SUCCESS, false);
+// 	res.redirect(linkIndex);
+// });
 
 // Delete
 router.get('/delete/:id', (req, res, next) => {
@@ -114,9 +131,8 @@ router.post('/save',uploadAvatar,
 	body('title').notEmpty().withMessage(notify.ERROR_TITLE_EMPTY),
 	body('categoriesId').not().isIn(['novalue']).withMessage(notify.ERROR_Category),
 	body('slug').matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).withMessage(notify.ERROR_SLUG),
-	body('ordering').isNumeric().withMessage(notify.ERROR_ORDERING),
+	body('ordering').isNumeric().isInt({ gt:0}).withMessage(notify.ERROR_ORDERING),
 	body('status').not().isIn(['novalue']).withMessage(notify.ERROR_STATUS),
-	body('positon').not().isIn(['novalue']).withMessage(notify.ERROR_POSITION),
 	body('thumbnail').custom((value,{req}) => {
 		const {image_uploaded,image_old} = req.body;
 		if(!image_uploaded && !image_old) {
@@ -128,6 +144,7 @@ router.post('/save',uploadAvatar,
 		return true;
 	}),
 	async (req, res, next) => {
+	// uploadAvatar(req, res,async (errUpload) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			let errorsMsg = {};

@@ -76,7 +76,24 @@ router.get('/sort/:field/:type', (req, res, next) => {
 	req.session.sortType = req.params.type;
 	res.redirect(linkIndex)
 });
+// Change ordering - Multi
+// router.post('/change-ordering', (req, res, next) => {
+// 	let cids 		= req.body.cid;
+// 	let orderings 	= req.body.ordering;
+	
+// 	if(Array.isArray(cids)) {
+// 		cids.forEach((item, index) => {
+// 			SlidersModel.updateOne({_id: item}, {ordering: parseInt(orderings[index])}, (err, result) => {});
+// 		})
+// 	}else{ 
+// 		SlidersModel.updateOne({_id: cids}, {ordering: parseInt(orderings)}, (err, result) => {});
+// 	}
 
+// 	req.flash('success', notify.CHANGE_ORDERING_SUCCESS, false);
+// 	res.redirect(linkIndex);
+// });
+
+// Delete
 router.get('/delete/:id', (req, res, next) => {
 	let id				= ParamsHelpers.getParam(req.params, 'id', ''); 	
 	
@@ -115,13 +132,13 @@ router.post('/save',
 		const {id, name} = req.body;
 		if(id) {
 			return Model.findById(id).select('id').then(item => {
-				if(item.id == value) return Promise.reject('Vui lòng chọn parentMenu khác '+name)
+				if(item.id == value) return Promise.reject('Vui lòng chọn parent khác '+name)
 			})
 		}
 		return true;
 	}),
 	body('slug').matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).withMessage(notify.ERROR_SLUG),
-	body('ordering').isNumeric().withMessage(notify.ERROR_ORDERING),
+	body('ordering').isNumeric().isInt({ gt:0}).withMessage(notify.ERROR_ORDERING),
 	body('status').not().isIn(['novalue']).withMessage(notify.ERROR_STATUS),
 	async (req, res, next) => {
 		const errors = validationResult(req);

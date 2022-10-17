@@ -129,7 +129,7 @@ router.get(('/form(/:id)?'), (req, res, next) => {
 router.post('/save',uploadAvatar,
 	body('name').isLength({ min: 5 ,max:20}).withMessage(util.format(notify.ERROR_NAME,5,20)),
 	body('slug').matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).withMessage(notify.ERROR_SLUG),
-	body('ordering').isNumeric().withMessage(notify.ERROR_ORDERING),
+	body('ordering').isNumeric().isInt({ gt:0}).withMessage(notify.ERROR_ORDERING),
 	body('status').not().isIn(['novalue']).withMessage(notify.ERROR_STATUS),
 	body('avatar').custom((value,{req}) => {
 		const {image_uploaded,image_old} = req.body;

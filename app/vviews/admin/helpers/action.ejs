@@ -9,7 +9,6 @@
         ];
         let xhtmlAction = '';
         let linkAddNew  = systemConfig.prefixAdmin + '/' + collection + '/form' ;
-
         actions.forEach((action)=> {
             let link = systemConfig.prefixAdmin + '/' + collection + '/' + action.value;
             xhtmlAction += `<option value="${link}">${action.name}</option>`;
@@ -17,8 +16,7 @@
 
         return `<div class="d-flex flex-wrap align-items-center justify-content-between mb-2">
                     <div class="mb-1">
-                        <select name="slbAction" class="slbAction custom-select custom-select-sm mr-1 " style="width: unset">
-                            
+                        <select name="slbAction" class="slbAction custom-select custom-select-sm mr-1 " style="width: unset">                         
                             ${xhtmlAction}
                         </select> 
                         <button id="btn-action" value="btnAction" disabled class="btnAction btn btn-sm btn-info">Apply <span class="badge badge-pill badge-danger navbar-badge" style="display: none"></span></button>

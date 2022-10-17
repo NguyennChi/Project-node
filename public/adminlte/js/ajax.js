@@ -9,6 +9,9 @@ const handleAjax = (link,field,id,evt) => {
          value = $(evt).data('value') == 'active' ? 'inactive' : 'active';
          xhtml = `<a href="javascript:void(0)" class="rounded-circle btn btn-sm ${value == 'active' ? 'btn-success' : 'btn-warning'}" onClick="handleAjax('${link}','status','${id}',this)" data-value="${value}"><i class="fas fa-check"></i></a>`;
          break;
+      case 'groups':
+         value = $(evt).data('value') == 'yes' ? 'no' : 'yes';
+         xhtml = `<a href="javascript:void(0)" class="rounded-circle btn btn-sm ${value == 'yes' ? 'btn-success' : 'btn-warning'}" onClick="handleAjax('${link}','groups_acp','${id}',this)" data-value="${value}"><i class="fas fa-check"></i></a>`;
       case 'position':
          value = $(evt).data('value') == 'topPost' ? 'normal' : 'topPost';
          xhtml = `<a href="javascript:void(0)" class="rounded-circle btn btn-sm ${value == 'topPost' ? 'btn-success' : 'btn-warning'}" onClick="handleAjax('${link}','position','${id}',this)" data-value="${value}"><i class=""></i>${value}</a>`;
@@ -17,6 +20,8 @@ const handleAjax = (link,field,id,evt) => {
          value = evt.value;
          if(isNaN(value)) {
             evt.value = evt.value.replace(/[^0-9]/g,'');
+            let val = evt.value
+            val = new RegExp('^0*[1-9]\d*$');
             ntf(evt,'Please Insert Number','error')
             return;
          } 
