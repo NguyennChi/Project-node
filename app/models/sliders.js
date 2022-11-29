@@ -1,44 +1,56 @@
-const { locale } = require("dayjs");
+const mainName = "sliders"
+const schemaCategory 	= require(__path_schemas_backend + mainName);
 
-const Collection = 'sliders';
-const Model = require(__path_schemas + Collection);
-const FileHelpers = require(__path_helpers + 'file');
 module.exports = {
-	getList(objWhere, pagination, {sortField, sortType}) {
-		let sort = sortField && sortType ? {[sortField]: sortType} : {_id: 'desc'};
-		return Model
-			.find(objWhere)
-			.sort(sort)
-			.skip((pagination.currentPage-1) * pagination.totalItemsPerPage)
-			.limit(pagination.totalItemsPerPage)
-	},	
-	countRow(objWhere) {
-		return Model.count(objWhere).then(data => data);
-	},
-	updateOne({id,field,value,...restParams} = {}){
-		if(!field) return Model.updateOne({_id: id}, restParams);
-		return Model.updateOne({_id: id}, {[field]: value,...restParams});
-	},
-	updateMany({cid,...restParams},field,value,operator = '$in') {
-		return Model.updateMany({_id: {[operator]: cid }}, {[field]: value,...restParams});
-	},
-	addOne(obj){
-		return new Model(obj).save();
-	},
-	deleteOne(id,field = null){
-		if(field) {
-			return Model.findById(id).select(field).then(data => {
-				FileHelpers.remove(`public/uploads/${Collection}/`, data[field]);
-			}).then(() => Model.deleteOne({_id: id}));
-		} else {
-			return Model.deleteOne({_id: id});
-		}
-		
-	},
-	deleteMulti(arrayId){
-		return Model.remove({_id: arrayId});
-	},
-	findById(id) {
-		return Model.findById(id);
-	}
+    saveItems: async (params) =>{
+            let data = await schemaCategory(params).save()
+            return
+        },
+        listItems: async (objWhere,
+            currentPage,
+            totalItemsPerPage,
+            updatedAt
+            ) => {
+                let data = await schemaCategory.find(objWhere)
+                                            .skip((currentPage-1) * totalItemsPerPage)
+                                            .limit(totalItemsPerPage)
+                                            .sort(updatedAt)
+                return data;
+},
+    deleteItem: async (id) =>{
+        let data = await schemaCategory.deleteOne({_id: id})
+        return
+    },
+    deleteItemsMulti: async (arrId) =>{
+        let data = await schemaCategory.deleteMany({_id: {$in: arrId}})
+        return
+    }
+    ,
+    changeStatus: async (id, status) =>{
+        let data = await schemaCategory.updateOne({_id: id}, {status: status})
+        return
+        },
+    changeStatusItemsMulti: async (arrId, status) =>{
+        let data = await schemaCategory.updateMany({_id: {$in: arrId}}, {status: status})
+
+    }
+    ,
+    changeOrdering: async (id, ordering) =>{
+            let data = await schemaCategory.updateOne({_id: id}, {ordering: ordering})
+            return
+            },
+    getItemByID: async (id) =>{
+        let data = await schemaCategory.find({_id: id})
+        return data
+        },
+    editItem: async (id, item) =>{
+        let data = await schemaCategory.updateOne({_id: id}, item)
+        return
+    },
+    changePrice: async (id, price) =>{
+        let data = await schemaCategory.updateOne({_id: id}, {price: price})
+        return
+    },
 }
+
+

@@ -3,73 +3,66 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const dayjs = require('dayjs')
-var relativeTime = require('dayjs/plugin/relativeTime')
-var locateVi = require('dayjs/locale/vi');
-dayjs.extend(relativeTime)
-dayjs.locale(locateVi)
-const validator = require('express-validator');
-const session = require('express-session');
-const flash = require('express-flash-notification');
-const expressLayouts = require('express-ejs-layouts');
+var flash        = require('req-flash');
+
+
 const mongoose = require('mongoose');
+const expressLayouts = require('express-ejs-layouts');
+const session = require('express-session');
 
 const pathConfig = require('./path');
 
-// Define Path
-global.__base           = __dirname + '/';
-global.__path_app       = __base + pathConfig.folder_app + '/';
-global.__path_configs   = __path_app + pathConfig.folder_configs + '/';
-global.__path_models     = __path_app + pathConfig.folder_models + '/';
-global.__path_helpers   = __path_app + pathConfig.folder_helpers + '/';
-global.__path_routers   = __path_app + pathConfig.folder_routers + '/';
-global.__path_schemas   = __path_app + pathConfig.folder_schemas + '/';
-// global.__path_validates = __path_app + pathConfig.folder_validates + '/';
-global.__path_views     = __path_app + pathConfig.folder_views + '/';
-global.__path_view_admin     = __path_views + pathConfig.folder_module_admin + '/';
-// global.__path_view_news      = __path_views + pathConfig.folder_module_news + '/';
-global.__path_public      = __base + pathConfig.folder_public + '/';
-global.__path_uploads     = __path_public + pathConfig.folder_uploads + '/';
+// Define path
+global.__base                       = __dirname + '/';
+global.__path_app                   = __base + pathConfig.folder_app + '/';
+global.__path_configs               = __path_app + pathConfig.folder_configs + '/';
+global.__path_helpers               = __path_app + pathConfig.folder_helpers + '/';
+global.__path_schemas               = __path_app + pathConfig.folder_schemas  + '/';
+global.__path_routers_backend       = __path_app + pathConfig.folder_routers_backend + '/';
+global.__path_views_backend         = __path_app + pathConfig.folder_views_backend + '/';
 
-const systemConfig = require(__path_configs + 'system');
-const databaseConfig = require(__path_configs + 'database');
-
-
-mongoose.connect(`mongodb+srv://${databaseConfig.username}:${databaseConfig.password}@atlascluster.fuuukty.mongodb.net/project_nodejs?retryWrites=true&w=majority`);
-
+const systemConfig = require (__path_configs + 'system');
 var app = express();
-app.use(cookieParser());
+
+
+// mongoose connect
+mongoose.connect('mongodb+srv://nguyenchi1:nguyenchi@atlascluster.fuuukty.mongodb.net/newProjcet')
+.then(
+  () => {console.log('connect success'); },
+  err => {console.log(err); }
+);
 app.use(session({
   secret: 'abcnhds',
   resave: false,
-  saveUninitialized: true}
-  ));
-
-app.use(flash(app, {
-  viewName: __path_view_admin + 'html/notify',
-}));
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 5*60*1000
+  }
+}
+));
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'app/views/backend'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
+app.set('layout','backend');
 
-// app.set('layout', __path_views + 'backend');
-app.set('layout', __path_view_admin + 'admin');
-
+// app.use(logger('dev'));
 // app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Local variable
 app.locals.systemConfig = systemConfig;
-app.locals.dayjs = dayjs;
-// Setup router
-//app.use(`/adminCCC}`, require(router/backend/index));
 
-app.use(`/${systemConfig.prefixAdmin}`, require(__path_routers + 'backend/index'));
-// app.use('/', require(__path_routers + 'frontend/index'));
+
+// router set up
+app.use(`/${systemConfig.prefixAdmin}`, require(__path_routers_backend + 'index'));
+app.use('/users', require(__path_routers_backend +'users'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -83,12 +76,8 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
- 
-    res.status(err.status || 500);
-    res.render(__path_view_admin +  'pages/error', { pageTitle   : 'Page Not Found ' });
- 
-
+  res.status(err.status || 500);
+  res.render(__path_views_backend +  'error');
 });
 
 module.exports = app;
-
