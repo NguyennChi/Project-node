@@ -39,3 +39,12 @@ table td div.option {
   text-align: left;
 }
 
+.opacity-100{
+    opacity: 50%;
+}
+td > .thumb-user{
+    width: 100px;
+}
+.pd-10{
+   margin-bottom: 10px;
+}

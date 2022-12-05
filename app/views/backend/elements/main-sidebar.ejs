@@ -3,20 +3,19 @@
         {parent: false, name: 'Dashboard', icon: 'fa-solid fa-gauge', link: `${systemConfig.prefixAdmin}/dashboard`},
         {parent: false, name: 'Slider', icon: 'fa-solid fa-clipboard', link: `${systemConfig.prefixAdmin}/sliders`},
         {parent: true, child: [
-          { name: 'Group', icon: 'fa-solid fa-user-group', link: `managegroup`},
-          { name: 'User', icon: 'fa-solid fa-user', link: `manageuser`},
-        ], name: 'Manage User', icon: 'fa-solid fa-people-roof', link: `#`},
+          { name: 'Group', icon: 'fa-solid fa-user-group', link: `group`},
+          { name: 'User', icon: 'fa-solid fa-user', link: `users`},
+                              ], name: 'Manage User', icon: 'fa-solid fa-people-roof', link: `/${systemConfig.prefixAdmin}/`},
         {parent: true, child: [
-            { name: 'Menu', icon: 'fa-solid fa-align-justify' , link: `managegroup`},
-            { name: 'Category', icon: 'fa-solid fa-list-alt', link: `managegroup`},
-            { name: 'Article', icon: 'fa-solid fa-newspaper', link: `manageuser`},
-        ], name: 'Manage Article', icon: 'fa-sharp fa-solid fa-bars-progress', link: `#`},
+          { name: 'Category', icon: 'fa-solid fa-list-alt', link: `category`},
+          { name: 'Article', icon: 'fa-solid fa-newspaper', link: `article`},
+          { name: 'Menu Bar', icon: 'fa-solid fa-align-justify', link: `menu`},
+                              ], name: 'Manage Article', icon: 'fa-sharp fa-solid fa-bars-progress', link: `/${systemConfig.prefixAdmin}/`},
         {parent: true, child: [
-          { name: 'RSS', icon: 'fa-solid fa-square-rss' , link: `managegroup`},
-          { name: 'Wheather', icon: 'fa-solid fa-cloud', link: `managegroup`},
-        ], name: 'Manage extendtion', icon: 'fa-solid fa-layer-group', link: `#`},
-        {parent: false, name: 'Contact', icon: 'fa-solid fa-envelopes-bulk', link: `#`},
-        {parent: false, name: 'Setting', icon: 'fa-sharp fa-solid fa-sliders', link: `#`},
+          { name: 'RSS', icon: 'fa-solid fa-square-rss', link: `rss`},
+          { name: 'Wheather', icon: 'fa-solid fa-cloud', link: `wheather`},
+                              ], name: 'Manage Extention', icon: 'fa-solid fa-layer-group', link: `/${systemConfig.prefixAdmin}/`},
+        {parent: false, name: 'Setting', icon: 'fa-solid fa-images', link: `${systemConfig.prefixAdmin}/setting`},
     ];
     
     let xhtmlMenu = '';
@@ -51,9 +50,9 @@
                           <i class="fas fa-angle-left right"></i>
                         </p>
                       </a>
-                        <ul class="nav nav-treeview" style="display: none;">
-                              ${childHtml}
-                        </ul>
+                      <ul class="nav nav-treeview" style="display: none;">
+                            ${childHtml}
+                      </ul>
                     </li>
                 `
       }
@@ -78,20 +77,6 @@
           <a href="#" class="d-block">Alexander Pierce</a>
         </div>
       </div>
-
-      <!-- SidebarSearch Form -->
-      <!-- <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
-      </div> -->
-
-      <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class

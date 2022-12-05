@@ -3,10 +3,12 @@
 <%- include('./../../helpers/pagination'); -%>
 <%- include('./../../helpers/showsucess'); -%>
 <%- include('./../../helpers/sortFiller'); -%>
-
+<%- include('./../../helpers/showoptionbox'); -%>
+<%- include('./../../helpers/groupsHelp'); -%>
 <% 
-   const collection = "sliders";
+   const collection = "article";
    const linkPrefix = "/" + systemConfig.prefixAdmin + `/${collection}/`;
+   const linkThumb = "/" + "uploads" + `/${collection}/`;
    %>
 
 <%- showSucess(inform.success) %>
@@ -48,7 +50,7 @@
 </div>
 <div class="card card-info card-outline">
    <div class="card-header">
-      <h4 class="card-title">List</h4>
+      <h4 class="card-title pd-10">List Fillter</h4>
       <div class="card-tools">
          <div class="btn-group">
             <button type="button" class="btn btn-info" data-toggle="dropdown" aria-expanded="false">Change Status</button>
@@ -69,8 +71,10 @@
             </button>
          <a href="<%= linkPrefix %>form/" class="btn btn-warning" style="background-color: #F0AD4E; color: white; font-weight: 500;">Add New</a>
          <!-- <a href="javascript: class="btn btn-tool" style="background-color: #C82333; color: white; font-weight: 500;">Delete Multi</a> -->
-         
       </div>
+      <div class="col-xs-4 col-sm-2">
+         <%- groupSelectHelper('Filter-category', category, categoryId) %>
+     </div>   
    </div>
    <div class="card-body">
       <!-- Control -->
@@ -86,13 +90,20 @@
                      </div>
                   </th>
                   <th class="text-center">#</a></th>
-                  <th class="text-center">
-                     <%- sortFielder (linkPrefix,'Name','name',sortField,sortType)  %>
-						</th>
+                  <th  class="text-center">
+                    <%- sortFielder (linkPrefix,'Name','name',sortField,sortType)  %>
+					</th>
+                    <th class="text-center">
+                        <%- sortFielder (linkPrefix,'Category','category',sortField,sortType)  %>
+                    </th>
+                    <th class="text-center">Option</a></th>
+                  <th class="text-center">thumb</a></th>
+                 
                   <th class="text-center ">Status</a></th>
-                  <th class="text-center">
+                  <th   class="text-center">
                      <%- sortFielder (linkPrefix,'Ordering','ordering',sortField,sortType)  %>
-                  </th>
+				    </th>
+                    
                   <th class="text-center">Action</th>
                </tr>
             </thead>
@@ -108,13 +119,31 @@
                      </td>
                      <td class="text-center"><%= index+1 %></td>
                      <td class="text-center" data-name ="<%= item.name %>"  id=""><%- highlightHelper(item.name, keyword) %></td>
+                     <td class="text-center position-relative" >
+                        <select id="category" data-id="<%= item.id %>" name="category" class="custom-select custom-select-sm">
+                            <% category.forEach( (value, index) => { %>
+                                <% if(value.id == item.categoryId){ %>
+                                    <option value="<%= value.id %>" selected><%= value.name %></option>
+                                    <% } else{ %>  
+                                    <option value="<%= value.id %>"><%= value.name %></option>
+                                 <% } %>
+                            <% }) %>
+                        </select>
+                    </td>
+                    <td class="text-center position-relative">
+                        <div class="option">
+                            <%- showOptionBox(item.id, item.slider, item.toppost, item.breakingnews, item.fearture)  %>
+                        </div>
+                     </td>
+                     <td class="text-center" id="thumb-item-<%= item.id%>">
+                        <img class="thumb-user" src="<%= linkThumb %><%= item.thumb%>" alt="thumb" onerror="this.onerror=null;this.src='<%= linkThumb %>/no-image-found.jpg'">
+					</td>
                      <td class="text-center position-relative" id="status-item-<%= item.id %>">
                         <%- statusHelper(collection, item.status, item.id)  %>
                      </td>
                      <td class="text-center position-relative" >
                         <input type="number" id="change-ordering-<%= item.id%>" name="items-ordering" data-router="<%= linkPrefix+'change-ordering'%>" data-id="<%= item.id%>"  value="<%= item.ordering%>" class="text-center ordering">
                      </td>
-
                      <td class="text-center">
                         <a href="<%= linkPrefix %>form/<%= item.id %>" class="rounded-circle btn btn-sm btn-info" title="Edit">
                            <i class="fas fa-pencil-alt"></i>

@@ -1,1 +1,2 @@
-tạo 1 action helper
+fix ajax group
+validate group

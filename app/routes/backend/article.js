@@ -4,17 +4,17 @@ const { body, validationResult } = require('express-validator');
 var util = require('util')
 
 
-const routerName 				= "users"
-const pageTitle 				= ` Users Management`
+const routerName 				= "article"
+const pageTitle 				= ` Article Management`
 const folderView				= __path_views_backend + `/pages/${routerName}/`;
 const layout 					= __path_views_backend + 'backend';
 
-const schemaUsers				= require(__path_schemas + routerName);
+const schemaArticle				= require(__path_schemas + routerName);
 const systemConfig 				= require(__path_configs + 'system');
 const notify 					= require(__path_configs + 'notify');
 const UtilsHelpers 				= require(__path_helpers + 'utils');
 const ParamsHelpers 			= require(__path_helpers + 'params');
-const schemaGroup 				= require(__path_schemas + 'group');
+const schemaCategory 			= require(__path_schemas + 'category');
 const {param} 					= require('express-validator');
 const FileHelpers				= require(__path_helpers + 'file');
 const uploadThumb	 			= FileHelpers.upload('thumb', `${routerName}`);
@@ -31,10 +31,11 @@ router.get('(/status/:status)?', async (req, res, next) => {
 		let keyword = ParamsHelpers.getParam(req.query, 'keyword', '');
 		let sortField = ParamsHelpers.getParam(req.session, 'sortField', 'ordering');
 		let sortType = ParamsHelpers.getParam(req.session, 'sortType', 'desc');
-		let groupID = ParamsHelpers.getParam(req.session, 'groupID', '');
+		let categoryId = ParamsHelpers.getParam(req.session, 'categoryId', '');
 		let sort	=  {};
-		let groupsItems = await schemaGroup.find({},{_id:1, name:1})
-		groupsItems.unshift({_id: 'allvalue', name: 'All Group'})
+		let category = await schemaCategory.find({status: 'active'})
+		// let groupsItems = await schemaCategory.find({},{_id:1, name:1})
+		// groupsItems.unshift({_id: 'allvalue', name: 'All Group'})
 		sort[sortField] = sortType;
 		let pagination = {
 			totalItems: 1,
@@ -42,14 +43,14 @@ router.get('(/status/:status)?', async (req, res, next) => {
 			currentPage: parseInt(ParamsHelpers.getParam(req.query, 'page', 1)),
 			pageRanges: 3
 		};
-		if (groupID !== '') objWhere = {'group.id': groupID}
-		if (groupID === 'allvalue') objWhere = {};
+		if (categoryId !== '') objWhere = {'categoryId': categoryId}
+		if (categoryId === 'allvalue') objWhere = {};
 		if (currentStatus !== 'all') objWhere = {status: currentStatus};
 		if (keyword !== '') objWhere.name = new RegExp(keyword, 'i');
-		await schemaUsers.count(objWhere).then((data) => {
+		await schemaArticle.count(objWhere).then((data) => {
 			pagination.totalItems = data;
 		});
-		await schemaUsers.find(objWhere)
+		await schemaArticle.find(objWhere)
 			.skip((pagination.currentPage - 1) * pagination.totalItemsPerPage)
 			.sort(sort)
 			.limit(pagination.totalItemsPerPage)
@@ -65,8 +66,8 @@ router.get('(/status/:status)?', async (req, res, next) => {
 					layout,
 					sortField,
 					sortType,
-					groupsItems: groupsItems,
-					groupID,
+					category: category,
+					categoryId
 				});
 			});
 
@@ -82,12 +83,12 @@ router.post('/change-status/(:status)?', async (req, res, next) => {
 		if (req.params.status === 'multi') {
 			let arrId = req.body.id.split(",")
 			let status = req.body.status
-			await schemaUsers.updateMany({ _id: { $in: arrId } }, { status: status })
+			await schemaArticle.updateMany({ _id: { $in: arrId } }, { status: status })
 			res.send({ success: true })
 		} else {
 			let { status, id } = req.body
 			status = (status == 'active') ? 'inactive' : 'active'
-			await schemaUsers.updateOne({ _id: id }, { status: status })
+			await schemaArticle.updateOne({ _id: id }, { status: status })
 			res.send({ success: true })
 		}
 
@@ -106,13 +107,13 @@ router.post('/delete/(:status)?', async (req, res, next) => {
 			let deletePhoto = await arrPhoto.forEach((value)=>{
 				FileHelpers.remove(`public/uploads/${routerName}/`, value)
 			})
-			await schemaUsers.deleteMany({ _id: { $in: arrId } })
+			await schemaArticle.deleteMany({ _id: { $in: arrId } })
 			res.send({ success: true })
 		} else {
 			let id = req.body.id
 			let thumb = req.body.thumb
 			let removePhoto = await FileHelpers.remove(`public/uploads/${routerName}/`, thumb)
-			await schemaUsers.deleteOne({ _id: id })
+			await schemaArticle.deleteOne({ _id: id })
 			res.send({ success: true })
 		}
 	} catch (error) {
@@ -128,7 +129,7 @@ body('ordering')
 async (req, res, next) => {
 	try {
 		let { ordering, id } = req.body
-		await schemaUsers.updateOne({ _id: id }, { ordering: ordering })
+		await schemaArticle.updateOne({ _id: id }, { ordering: ordering })
 		res.send({ success: true })
 	} catch (error) {
 		console.log(error);
@@ -139,22 +140,19 @@ async (req, res, next) => {
 // form
 router.get('/form(/:id)?',async (req, res, next) => {
 	try {
-		 let groupsItems = await schemaGroup.find({},{_id:1, name:1})
-		 groupsItems.unshift({_id: 'novalue', name: 'Choose Group'})
-		
+		let category = await schemaCategory.find({status:'active'})
 		let main = {
 			pageTitle: pageTitle,
-			groupsItems: groupsItems,
+			categoryList: category,
 		} 
 		if (req.params.id != undefined) {
-			schemaUsers.countDocuments({ _id: req.params.id }, async function (err, count) {
+			schemaArticle.countDocuments({ _id: req.params.id }, async function (err, count) {
 				if (count > 0) {
-					let item = await schemaUsers.find({ _id: req.params.id });
+					let item = await schemaArticle.find({ _id: req.params.id });
 					res.render(`${folderView}form`, {
 						main: main,
 						item: item[0],
 						layout,
-						itemGroup:item[0].group.name,
 					});
 				} else {
 					res.redirect(linkIndex);
@@ -164,7 +162,6 @@ router.get('/form(/:id)?',async (req, res, next) => {
 			res.render(`${folderView}form`, {
 				main: main,
 				item: [],
-				itemGroup: '',
 				layout
 			});
 		}
@@ -182,7 +179,7 @@ body('name')
 			.withMessage(util.format(notify.ERROR_NAME,5,100))
 			.custom(async (val, {req}) => {
 			let paramId = (req.params.id != undefined) ? req.params.id : 0
-			return await schemaUsers.find({name: val}).then(async user => {
+			return await schemaArticle.find({name: val}).then(async user => {
 				let length = user.length
 				user.forEach((value, index) => {
 					if (value.id == paramId) 
@@ -198,7 +195,7 @@ body('name')
 		.withMessage(notify.ERROR_SLUG)
 		.custom(async (val, {req}) => {
 			let paramId = (req.params.id != undefined) ? req.params.id : 0
-			return await schemaUsers.find({slug: val}).then(async user => {
+			return await schemaArticle.find({slug: val}).then(async user => {
 				let length = user.length
 				user.forEach((value, index) => {
 					if (value.id == paramId) 
@@ -210,7 +207,23 @@ body('name')
 				}
 				return
 	})}),
-	
+	body('editordata')
+		.not()
+		.isEmpty()
+		.withMessage(notify.ERROR_DESCRIPTION),
+	body('categoryId')
+		.custom(async (val, {req}) => {
+			if ( val == undefined) {
+				return Promise.reject(notify.ERROR_CATEGORY)
+			} else {
+				try {
+					let data = await schemaCategory.findOne({_id: val, status:'active'});
+					return data;
+				} catch (error) {
+					return Promise.reject(notify.ERROR_CATEGORY_INVALID)
+				}
+			}
+		}),
 	body('ordering')
 		.isInt({min: 0, max: 99})
 		.withMessage(util.format(notify.ERROR_ORDERING,0,99)),
@@ -233,19 +246,20 @@ body('name')
 	async function (req, res) { 
 		try {
 			let item = req.body;
-			console.log( item)
+			item.slider = !item.slider ? false : true
+			item.toppost = !item.toppost ? false : true
+			item.breakingnews = !item.breakingnews ? false : true
+			item.fearture = !item.fearture ? false : true
 			let itemData = [{}]
-			let groupsItems = await schemaGroup.find({},{_id:1, name:1})
-				groupsItems.unshift({_id: 'novalue', name: 'Choose Group'})
 			if(req.params.id != undefined){
-				itemData = await schemaUsers.find({_id: req.params.id})
+				itemData = await schemaArticle.find({_id: req.params.id})
 			}
 			let errors = validationResult(req)
 			if(!errors.isEmpty()) {
-				
+				let category = await schemaCategory.find({status:'active'})
 				let main = {pageTitle: pageTitle,
 							showError: errors.errors,
-							groupsItems: groupsItems
+							categoryList: category,
 						}
 				if(req.file != undefined) FileHelpers.remove(`public/uploads/${routerName}/`, req.file.filename); // xóa tấm hình khi form không hợp lệ
 				if (req.params.id !== undefined){
@@ -274,25 +288,17 @@ body('name')
 				}
 			}
 				if (req.params.id !== undefined) {
-					await schemaUsers.updateOne({_id: req.params.id}, 
+					await schemaArticle.updateOne({_id: req.params.id}, 
 						item,  
-						item.group = {
-						id : item.group_id,
-						name : item.group_name
-					} )
-					await schemaUsers.updateMany({'group.id': req.params.id}, 
-					item.group= {
-						id : item.group_id,
-						name : item.group_name
-					} )
+						 )
 					req.flash('success', notify.EDIT_SUCCESS);
 					res.redirect(linkIndex);
 				} else {
-					item.group = {
-						id : item.group_id,
-						name : item.group_name
-					},
-					await schemaUsers(item).save();
+					await schemaArticle(item).save(async function(err,room) {
+						let articleArr = await schemaCategory.findById({_id: room.categoryId})
+						articleArr.articles.push(room)
+						console.log(articleArr.articles.push(room));
+						await schemaCategory(articleArr).save()});
 					req.flash('success', notify.ADD_SUCCESS);
 					res.redirect(linkIndex);
 				}
@@ -308,9 +314,51 @@ router.get('/sort/:sort_field/:sort_type', (req, res, next) => {
 });	
 
 // Fillter
-router.get('/fillter-group/:group_id', (req, res, next) => {
-	req.session.groupID = ParamsHelpers.getParam( req.params, 'group_id', '');
+router.get('/Filter-category/:category_id', (req, res, next) => {
+	req.session.categoryId = ParamsHelpers.getParam( req.params, 'category_id', '');
 	res.redirect(linkIndex)
-});	
-
+});
+// option
+router.post('(/option)', async (req, res, next) => {
+	try {
+		let {id, field, isCheck} = req.body
+			await schemaArticle.updateOne(id, field, isCheck)
+		res.send({success: true})
+	} catch (error) {
+		console.log(error)
+	}
+})
+// changecategory
+router.post('/changecategory',
+		body('id')
+				.custom(async (val, {req}) => {
+				return await schemaArticle.findOne({_id: val}).then(async user => {
+					if (!user) {
+						return Promise.reject(notify.ERROR_NOT_EXITS)
+					}
+					return
+				})}),
+		body('newCategory')
+				.custom(async (val, {req}) => {
+				return await schemaCategory.findOne({_id: val}).then(async user => {
+					if (!user) {
+						return Promise.reject(notify.ERROR_NOT_EXITS)
+					}
+					return
+			})}),
+	async (req, res, next) => {
+		try {
+			let {id, newCategory} = req.body
+			let errors = validationResult(req)
+			if(!errors.isEmpty()) {
+				res.send({success: false})
+			}else{
+				await schemaArticle.updateOne(id, newCategory)
+				res.send({success: true})
+			}
+	} catch (error) {
+		console.log(error)
+		res.send({success: false})
+	}
+});
 module.exports = router;

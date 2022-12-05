@@ -3,9 +3,8 @@
 <%- include('./../../helpers/pagination'); -%>
 <%- include('./../../helpers/showsucess'); -%>
 <%- include('./../../helpers/sortFiller'); -%>
-
 <% 
-   const collection = "sliders";
+   const collection = "category";
    const linkPrefix = "/" + systemConfig.prefixAdmin + `/${collection}/`;
    %>
 
@@ -86,11 +85,11 @@
                      </div>
                   </th>
                   <th class="text-center">#</a></th>
-                  <th class="text-center">
+                  <th class="text-center sort">
                      <%- sortFielder (linkPrefix,'Name','name',sortField,sortType)  %>
 						</th>
                   <th class="text-center ">Status</a></th>
-                  <th class="text-center">
+                  <th class="text-center sort">
                      <%- sortFielder (linkPrefix,'Ordering','ordering',sortField,sortType)  %>
                   </th>
                   <th class="text-center">Action</th>

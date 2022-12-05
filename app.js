@@ -20,13 +20,16 @@ global.__path_helpers               = __path_app + pathConfig.folder_helpers + '
 global.__path_schemas               = __path_app + pathConfig.folder_schemas  + '/';
 global.__path_routers_backend       = __path_app + pathConfig.folder_routers_backend + '/';
 global.__path_views_backend         = __path_app + pathConfig.folder_views_backend + '/';
+global.__path_public                = __base + pathConfig.folder_public + '/';
+global.__path_uploads               = __path_public + pathConfig.folder_uploads + '/';
 
 const systemConfig = require (__path_configs + 'system');
 var app = express();
 
 
 // mongoose connect
-mongoose.connect('mongodb+srv://nguyenchi1:nguyenchi@atlascluster.fuuukty.mongodb.net/newProjcet')
+mongoose.connect('mongodb+srv://nguyenchi:nguyenchi@atlascluster.fuuukty.mongodb.net/newsProject')
+
 .then(
   () => {console.log('connect success'); },
   err => {console.log(err); }
@@ -62,7 +65,7 @@ app.locals.systemConfig = systemConfig;
 
 // router set up
 app.use(`/${systemConfig.prefixAdmin}`, require(__path_routers_backend + 'index'));
-app.use('/users', require(__path_routers_backend +'users'));
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

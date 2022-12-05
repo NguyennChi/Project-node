@@ -265,7 +265,6 @@ $(document).ready(async function () {
     // Change ordering
     const orderingInput = document.querySelectorAll('input[name="items-ordering"]');
     orderingInput.forEach(item => {
-        console.log(item);
         item. addEventListener('change',event => {
             console.log(event);
             let id = event.target.getAttribute('data-id')
@@ -296,7 +295,7 @@ $(document).ready(async function () {
     }
 
     // change slus
-        const inputNameForm = $("input#name-input-form")
+    const inputNameForm = $("input#name-input-form")
     const inputSlugForm = $("input#slug-input-form")
     inputNameForm.on("change paste keyup", function () {
         inputSlugForm.val(ChangeToSlug($(this).val()));
@@ -329,33 +328,122 @@ $(document).ready(async function () {
         return slug
     }
 
-    // createLink
+// get value group
+  $('select[name="group_id"]').change(function (value) {
+    $('input[name="group_name"]').val($(this).find(":selected").text());
+});
 
-    function createLink(exceptParams) {
-        let pathname = window.location.pathname;
-        let searchParams = new URLSearchParams(window.location.search);
-        let searchParamsEntries = searchParams.entries();
-    
-        let link = pathname + '?';
-        for (let pair of searchParamsEntries) {
-            if (exceptParams.indexOf(pair[0]) == -1) {
-                link += `${pair[0]}=${pair[1]}&`;
+// fillter group
+
+$('select[name="Filter-group"]').change(function (value) {
+   const path = window.location.pathname.split('/');
+   const linkRedirect = '/' + path[1] + '/' + path[2] + '/fillter-group/'+ $(this).val();
+   window.location.pathname = linkRedirect
+});
+
+//  thumb
+showPreview = (FileList, value) => {
+    if (typeof (FileReader) != "undefined") {
+        var dvPreview = $(`#divImageMediaPreview${value}`);
+        dvPreview.html("");
+        $(FileList).each(function () {
+            var file = $(this);
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var img = $("<img />");
+                img.attr("style", "width: 58%;");
+                img.attr("src", e.target.result);
+                dvPreview.append(img);
             }
-        }
-        return link;
+            reader.readAsDataURL(file[0]);
+        });
+    } else {
+        alert("This browser does not support HTML5 FileReader.");
     }
-    function sortList(field, order) {
-        // http://php01.test/mvc-multi/index.php?module=admin&controller=group&action=index&filter_status=active&search=a&sort_field=name&sort_order=desc
-        $('input[name="sort_field"]').val(field);
-        $('input[name="sort_order"]').val(order);
-    
-        let exceptParams = ['page', 'sort_field', 'sort_order'];
-        let link = createLink(exceptParams);
-    
-        link += `sort_field=${field}&sort_order=${order}`;
-        window.location.href = link;
-    
-        // $('#form-table').submit();
-    }
+}
+
+$("#ImageMediasLarge").change(function (e) {
+    let value = e.target.getAttribute('value')
+    showPreview($(this)[0].files, value);
+});
+
+$("#ImageMediasSmall").change(function (e) {
+    let value = e.target.getAttribute('value')
+    showPreview($(this)[0].files, value);
+});
+
+$("#ImageMediasTitle").change(function (e) {
+    let value = e.target.getAttribute('value')
+    showPreview($(this)[0].files, value);
+});
+
+$("#ImageMediasArticle").change(function (e) {
+    let value = e.target.getAttribute('value')
+    showPreview($(this)[0].files, value);
+});
+$("#ImageMediasBanner").change(function (e) {
+    let value = e.target.getAttribute('value')
+    showPreview($(this)[0].files, value);
+});
+
+// changeOption
+// changeOption = (data, isCheck) => {
+//     let dataArr = data.split("-")
+//     let id = dataArr[1]
+//     let fieldOption = dataArr[0]
+//     $.ajax({
+//         type: "post",
+//         url: `/${linkAdmin}article/option`,
+//         data: `id=${id}&field=${fieldOption}&isCheck=${isCheck}`,
+//         dataType: "json",
+//         success: function (response) {
+//             if (response.success == true) {
+//                 toastr["success"](notify.CHANGE_OPTION_SUCCESS)
+//             } else {
+//                 toastr["error"](notify.CHANGE_OPTION_ERROR)
+//             }
+//         }
+//     });
+// }
+
+// $("div.option input:checkbox").change(function (value) {
+//     let data = value.target.getAttribute('id')
+//     if (this.checked) {
+//         changeOption(data, true)
+//     } else {
+//         changeOption(data, false)
+//     }
+// });
+
+// $("select[name='category']").change(function (value) {
+//     let id = value.target.getAttribute('data-id')
+//     let newCategory = $(this).find(":selected").val()
+//     $.ajax({
+//         type: "post",
+//         url: `/${linkAdmin}article/changecategory`,
+//         data: `id=${id}&newCategory=${newCategory}`,
+//         dataType: "json",
+//         success: function (response) {
+//             if (response.success == true) {
+//                 toastr["success"](notify.CHANGE_CATEGORY_SUCCESS)
+//             } else {
+//                 toastr["error"](notify.CHANGE_CATEGORY_ERROR)
+//             }
+//         }
+//     });
+// })
+
+// fillter group
+
+$('select[name="Filter-category"]').change(function (value) {
+    const path = window.location.pathname.split('/');
+    const linkRedirect = '/' + path[1] + '/' + path[2] + '/Filter-category/'+ $(this).val();
+    window.location.pathname = linkRedirect
+ });
+
+// nested menu
+
+
+
 });
 

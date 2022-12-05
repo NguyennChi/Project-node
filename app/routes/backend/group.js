@@ -4,12 +4,13 @@ const { body, validationResult } = require('express-validator');
 var util = require('util')
 
 
-const routerName 				= "sliders"
-const pageTitle 				= ` Sliders  Management`
+const routerName 				= "group"
+const pageTitle 				= ` Group Management`
 const folderView				= __path_views_backend + `/pages/${routerName}/`;
 const layout 					= __path_views_backend + 'backend';
 
-const schemaSlider 				= require(__path_schemas + routerName);
+const schemaGroup 				= require(__path_schemas + routerName);
+const schemaUsers				= require(__path_schemas + 'users');
 const systemConfig 				= require(__path_configs + 'system');
 const notify 					= require(__path_configs + 'notify');
 const UtilsHelpers 				= require(__path_helpers + 'utils');
@@ -37,10 +38,10 @@ router.get('(/status/:status)?', async (req, res, next) => {
 		};
 		if (currentStatus !== 'all') objWhere = {status: currentStatus};
 		if (keyword !== '') objWhere.name = new RegExp(keyword, 'i');
-		await schemaSlider.count(objWhere).then((data) => {
+		await schemaGroup.count(objWhere).then((data) => {
 			pagination.totalItems = data;
 		});
-		await schemaSlider.find(objWhere)
+		await schemaGroup.find(objWhere)
 			.skip((pagination.currentPage - 1) * pagination.totalItemsPerPage)
 			.sort(sort)
 			.limit(pagination.totalItemsPerPage)
@@ -71,12 +72,12 @@ router.post('/change-status/(:status)?', async (req, res, next) => {
 		if (req.params.status === 'multi') {
 			let arrId = req.body.id.split(",")
 			let status = req.body.status
-			await schemaSlider.updateMany({ _id: { $in: arrId } }, { status: status })
+			await schemaGroup.updateMany({ _id: { $in: arrId } }, { status: status })
 			res.send({ success: true })
 		} else {
 			let { status, id } = req.body
 			status = (status == 'active') ? 'inactive' : 'active'
-			await schemaSlider.updateOne({ _id: id }, { status: status })
+			await schemaGroup.updateOne({ _id: id }, { status: status })
 			res.send({ success: true })
 		}
 
@@ -91,11 +92,11 @@ router.post('/delete/(:status)?', async (req, res, next) => {
 	try {
 		if (req.params.status === 'multi') {
 			let arrId = req.body.id.split(",")
-			await schemaSlider.deleteMany({ _id: { $in: arrId } })
+			await schemaGroup.deleteMany({ _id: { $in: arrId } })
 			res.send({ success: true })
 		} else {
 			let id = req.body.id
-			await schemaSlider.deleteOne({ _id: id })
+			await schemaGroup.deleteOne({ _id: id })
 			res.send({ success: true })
 		}
 	} catch (error) {
@@ -112,7 +113,7 @@ body('ordering')
 async (req, res, next) => {
 	try {
 		let { ordering, id } = req.body
-		await schemaSlider.updateOne({ _id: id }, { ordering: ordering })
+		await schemaGroup.updateOne({ _id: id }, { ordering: ordering })
 		res.send({ success: true })
 	} catch (error) {
 		console.log(error);
@@ -128,9 +129,9 @@ router.get('/form(/:id)?', (req, res, next) => {
 			pageTitle: pageTitle,
 		}
 		if (req.params.id != undefined) {
-			schemaSlider.countDocuments({ _id: req.params.id }, async function (err, count) {
+			schemaGroup.countDocuments({ _id: req.params.id }, async function (err, count) {
 				if (count > 0) {
-					let item = await schemaSlider.find({ _id: req.params.id });
+					let item = await schemaGroup.find({ _id: req.params.id });
 					res.render(`${folderView}form`, {
 						main: main,
 						item: item[0],
@@ -152,15 +153,13 @@ router.get('/form(/:id)?', (req, res, next) => {
 	}
 });
 
-// save
-
 router.post('/save(/:id)?',
 body('name')
 	.isLength({ min: 5, max: 100 })
 	.withMessage(util.format(notify.ERROR_NAME, 5, 100))
 	.custom(async (val, { req }) => {
 		let paramId = await (req.params.id != undefined) ? req.params.id : 0
-		return await schemaSlider.find({ name: val }).then(async user => {
+		return await schemaGroup.find({ name: val }).then(async user => {
 			let length = user.length
 			user.forEach((value, index) => {
 				if (value.id == paramId)
@@ -177,7 +176,7 @@ body('name')
 	.withMessage(notify.ERROR_SLUG)
 	.custom(async (val, { req }) => {
 		let paramId = (req.params.id != undefined) ? req.params.id : 0
-		return await schemaSlider.find({ slug: val }).then(async user => {
+		return await schemaGroup.find({ slug: val }).then(async user => {
 			let length = user.length
 			user.forEach((value, index) => {
 				if (value.id == paramId)
@@ -193,13 +192,13 @@ body('name')
 		.isInt({ min: 0, max: 99 })
 		.withMessage(util.format(notify.ERROR_ORDERING, 0, 99)),
 	body('status').not().isIn(['novalue']).withMessage(notify.ERROR_STATUS),
-
 	async  (req, res) => {
+		console.log(req.body);
 		try {
 			let item = req.body;
 		let itemData = [{}]
 		if (req.params.id != undefined) {
-			itemData = await schemaSlider.find({ _id: req.params.id })
+			itemData = await schemaGroup.find({ _id: req.params.id })
 			console.log(itemData);
 		}
 		let errors = await validationResult(req)
@@ -225,11 +224,15 @@ body('name')
 			return
 		}
 		if (req.params.id !== undefined) {
-			await schemaSlider.updateOne({_id: req.params.id}, item)
+			await schemaGroup.updateOne({_id: req.params.id}, item)
 			req.flash('success', notify.EDIT_SUCCESS);
 			res.redirect(linkIndex);
 		} else {
-			await schemaSlider(item).save();
+			await schemaGroup(item).save();
+			await schemaUsers(item.group = {
+				id : item.group_id,
+				name : item.group_name
+			}).save();
 			req.flash('success', notify.ADD_SUCCESS);
 			res.redirect(linkIndex);
 		}
@@ -237,7 +240,6 @@ body('name')
 			console.log(error);
 		}	
 	});
-
 // Sort
 router.get('/sort/:sort_field/:sort_type', (req, res, next) => {
 	req.session.sortField = ParamsHelpers.getParam( req.params, 'sort_field', '');
@@ -245,4 +247,17 @@ router.get('/sort/:sort_field/:sort_type', (req, res, next) => {
 	res.redirect(linkIndex)
 });	
 
+
+// Cần hoàn thành
+
+// router.post('/change-group',
+// async (req, res, next) => {
+// 	try {
+// 		let { group, id } = req.body
+// 		await schemaGroup.updateOne({ _id: id }, { group: group })
+// 		res.send({ success: true })
+// 	} catch (error) {
+// 		console.log(error);
+// 	}
+// });
 module.exports = router;

@@ -16,6 +16,8 @@ module.exports = {
     ERROR_TITLE_DUPLICATED: 'Duplicated Title',
     ERROR_ORDERING: 'Ordering must be number from %d to %d',
     ERROR_STATUS: 'Status must be choose',
+    ERROR_GROUP: 'Group must be choose',
+    ERROR_GROUP_DUPLICATED: 'Duplicated Group',
     ERROR_CATEGORY: "Category must be choose",
     ERROR_CATEGORY_INVALID: "Category is invalid",
     ERROR_SLUG: 'Invalid Slug',

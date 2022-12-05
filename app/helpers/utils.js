@@ -23,7 +23,17 @@ let createFilterStatus = async (currentStatus, collection) => {
 
 	return statusFilter;
 }
+const countCollection = async (arrKey, collectionModel) => {
+	for (let i = 0; i < arrKey.length; i++) {
+		  let key = arrKey[i];
+		  await collectionModel[key].count({}).then( (data) => {
+			  collectionModel[key] = data;
+		  });
+	  }
+	  return collectionModel;
+  }
 
 module.exports = {
-	createFilterStatus: createFilterStatus
+	createFilterStatus: createFilterStatus,
+	countCollection: countCollection
 }

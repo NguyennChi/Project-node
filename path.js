@@ -5,4 +5,6 @@ module.exports = {
     folder_helpers              : 'helpers',
     folder_views_backend        : 'views/backend',
     folder_routers_backend      : 'routes/backend',
+    folder_public               : 'public',
+    folder_uploads              : 'uploads',
 };

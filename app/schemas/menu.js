@@ -6,9 +6,10 @@ const schema = new mongoose.Schema({
     name: String, 
     slug: String,
     status: String,
-    ordering: Number
+    ordering: Number,
+    parentId: String,
  },
  { timestamps: true }
  );
 
-module.exports = mongoose.model(databaseConfig.col_sliders, schema);
+module.exports = mongoose.model(databaseConfig.col_menu, schema);
