@@ -39,7 +39,7 @@ router.get('(/status/:status)?', async (req, res, next) => {
 		sort[sortField] = sortType;
 		let pagination = {
 			totalItems: 1,
-			totalItemsPerPage: 3,
+			totalItemsPerPage: 10,
 			currentPage: parseInt(ParamsHelpers.getParam(req.query, 'page', 1)),
 			pageRanges: 3
 		};
@@ -175,7 +175,7 @@ router.get('/form(/:id)?',async (req, res, next) => {
 router.post('/save(/:id)?', 
 uploadThumb,
 body('name')
-			.isLength({min: 5, max: 100})
+			.isLength({min: 5, max: 200})
 			.withMessage(util.format(notify.ERROR_NAME,5,100))
 			.custom(async (val, {req}) => {
 			let paramId = (req.params.id != undefined) ? req.params.id : 0
@@ -353,7 +353,7 @@ router.post('/changecategory',
 			if(!errors.isEmpty()) {
 				res.send({success: false})
 			}else{
-				await schemaArticle.updateOne(id, newCategory)
+				await schemaArticle.updateOne({ _id: id }, { ordering: ordering })
 				res.send({success: true})
 			}
 	} catch (error) {

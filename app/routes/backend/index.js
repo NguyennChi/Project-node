@@ -8,5 +8,8 @@ router.use('/group', require('./group'));
 router.use('/category', require('./category'));
 router.use('/article', require('./article'));
 router.use('/menu', require('./menu'));
+router.use('/rss', require('./rss'));
+router.use('/weather', require('./weather'));
 router.use('/setting', require('./setting'));
+
 module.exports = router;

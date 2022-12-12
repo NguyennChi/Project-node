@@ -22,6 +22,9 @@ global.__path_routers_backend       = __path_app + pathConfig.folder_routers_bac
 global.__path_views_backend         = __path_app + pathConfig.folder_views_backend + '/';
 global.__path_public                = __base + pathConfig.folder_public + '/';
 global.__path_uploads               = __path_public + pathConfig.folder_uploads + '/';
+global.__path_routers_frontend      = __path_app + pathConfig.folder_routers_frontend + '/';
+global.__path_views_frontend        = __path_app + pathConfig.folder_views_frontend + '/';
+
 
 const systemConfig = require (__path_configs + 'system');
 var app = express();
@@ -45,10 +48,10 @@ app.use(session({
 ));
 
 // view engine setup
-app.set('views', path.join(__dirname, 'app/views/backend'));
+app.set('views', path.join(__dirname, 'app/views/frontend'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
-app.set('layout','backend');
+app.set('layout', __path_views_frontend + '/frontend');
 
 // app.use(logger('dev'));
 // app.use(logger('dev'));
@@ -64,6 +67,7 @@ app.locals.systemConfig = systemConfig;
 
 
 // router set up
+app.use('/', require(__path_routers_frontend + 'index'));
 app.use(`/${systemConfig.prefixAdmin}`, require(__path_routers_backend + 'index'));
 
 

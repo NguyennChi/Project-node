@@ -5,5 +5,7 @@ module.exports = {
     col_category: 'category',
     col_article: 'article',
     col_menu: 'menu',
-    col_setting: 'setting'
+    col_setting: 'setting',
+    col_rss: 'rss',
+    col_weather: 'weather'
 };

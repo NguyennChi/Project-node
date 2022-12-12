@@ -387,51 +387,51 @@ $("#ImageMediasBanner").change(function (e) {
 });
 
 // changeOption
-// changeOption = (data, isCheck) => {
-//     let dataArr = data.split("-")
-//     let id = dataArr[1]
-//     let fieldOption = dataArr[0]
-//     $.ajax({
-//         type: "post",
-//         url: `/${linkAdmin}article/option`,
-//         data: `id=${id}&field=${fieldOption}&isCheck=${isCheck}`,
-//         dataType: "json",
-//         success: function (response) {
-//             if (response.success == true) {
-//                 toastr["success"](notify.CHANGE_OPTION_SUCCESS)
-//             } else {
-//                 toastr["error"](notify.CHANGE_OPTION_ERROR)
-//             }
-//         }
-//     });
-// }
+changeOption = (data, isCheck) => {
+    let dataArr = data.split("-")
+    let id = dataArr[1]
+    let fieldOption = dataArr[0]
+    $.ajax({
+        type: "post",
+        url: `/${linkAdmin}article/option`,
+        data: `id=${id}&field=${fieldOption}&isCheck=${isCheck}`,
+        dataType: "json",
+        success: function (response) {
+            if (response.success == true) {
+                toastr["success"](notify.CHANGE_OPTION_SUCCESS)
+            } else {
+                toastr["error"](notify.CHANGE_OPTION_ERROR)
+            }
+        }
+    });
+}
 
-// $("div.option input:checkbox").change(function (value) {
-//     let data = value.target.getAttribute('id')
-//     if (this.checked) {
-//         changeOption(data, true)
-//     } else {
-//         changeOption(data, false)
-//     }
-// });
+$("div.option input:checkbox").change(function (value) {
+    let data = value.target.getAttribute('id')
+    if (this.checked) {
+        changeOption(data, true)
+    } else {
+        changeOption(data, false)
+    }
+});
 
-// $("select[name='category']").change(function (value) {
-//     let id = value.target.getAttribute('data-id')
-//     let newCategory = $(this).find(":selected").val()
-//     $.ajax({
-//         type: "post",
-//         url: `/${linkAdmin}article/changecategory`,
-//         data: `id=${id}&newCategory=${newCategory}`,
-//         dataType: "json",
-//         success: function (response) {
-//             if (response.success == true) {
-//                 toastr["success"](notify.CHANGE_CATEGORY_SUCCESS)
-//             } else {
-//                 toastr["error"](notify.CHANGE_CATEGORY_ERROR)
-//             }
-//         }
-//     });
-// })
+$("select[name='category']").change(function (value) {
+    let id = value.target.getAttribute('data-id')
+    let newCategory = $(this).find(":selected").val()
+    $.ajax({
+        type: "post",
+        url: `/${linkAdmin}article/changecategory`,
+        data: `id=${id}&newCategory=${newCategory}`,
+        dataType: "json",
+        success: function (response) {
+            if (response.success == true) {
+                toastr["success"](notify.CHANGE_CATEGORY_SUCCESS)
+            } else {
+                toastr["error"](notify.CHANGE_CATEGORY_ERROR)
+            }
+        }
+    });
+})
 
 // fillter group
 
@@ -443,7 +443,24 @@ $('select[name="Filter-category"]').change(function (value) {
 
 // nested menu
 
-
+$("select[name='parentMenu']").change(function (value) {
+    let id = value.target.getAttribute('data-id')
+    let newParent = $(this).find(":selected").val()
+    $.ajax({
+        type: "post",
+        url: `menu/changeparentmenu`,
+        data: `id=${id}&newParent=${newParent}`,
+        dataType: "json",
+        success: function (response) {
+            if (response.success == true) {
+                toastr["success"](notify.CHANGE_MENUTYPE_SUCCESS)
+            } else {
+                console.log(123);
+                toastr["error"](notify.CHANGE_MENUTYPE_ERROR)
+            }
+        }
+    });
+})
 
 });
 

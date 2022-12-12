@@ -28,6 +28,7 @@ router.get('(/status/:status)?', async (req, res, next) => {
 		let sortField = ParamsHelpers.getParam(req.session, 'sortField', 'ordering');
 		let sortType = ParamsHelpers.getParam(req.session, 'sortType', 'desc');
 		let sort	=  {};
+		let parentMenuList = await schemaMenu.find({parentMenu : "parentmenu"})
 		sort[sortField] = sortType;
 		let pagination = {
 			totalItems: 1,
@@ -56,6 +57,7 @@ router.get('(/status/:status)?', async (req, res, next) => {
 					layout,
 					sortField,
 					sortType,
+					parentMenuList
 				});
 			});
 
@@ -122,11 +124,14 @@ async (req, res, next) => {
 
 // form
 
-router.get('/form(/:id)?', (req, res, next) => {
+router.get('/form(/:id)?', async (req, res, next) => {
 	try {
+		let parentMenuList = await schemaMenu.find({parentMenu : "parentmenu"})
 		let main = {
 			pageTitle: pageTitle,
+			parentMenuList,
 		}
+		
 		if (req.params.id != undefined) {
 			schemaMenu.countDocuments({ _id: req.params.id }, async function (err, count) {
 				if (count > 0) {
@@ -143,7 +148,7 @@ router.get('/form(/:id)?', (req, res, next) => {
 		} else {
 			res.render(`${folderView}form`, {
 				main: main,
-				item: [],
+				item: [{name: '', ordering: 0, status: 'novalue'}],
 				layout
 			});
 		}
@@ -196,17 +201,18 @@ body('name')
 
 	async  (req, res) => {
 		try {
-			let item = req.body;
+		let parentMenuList = await schemaMenu.find({parentMenu : "parentmenu"})
+		let item = req.body;
 		let itemData = [{}]
 		if (req.params.id != undefined) {
 			itemData = await schemaMenu.find({ _id: req.params.id })
-			console.log(itemData);
 		}
 		let errors = await validationResult(req)
 		if (!errors.isEmpty()) {
 			let main = {
 				pageTitle: pageTitle,
 				showError: errors.errors,
+				parentMenuList
 			}
 			if (req.params.id !== undefined) {
 				res.render(`${folderView}form`, {
@@ -244,6 +250,45 @@ router.get('/sort/:sort_field/:sort_type', (req, res, next) => {
 	req.session.sortType = ParamsHelpers.getParam( req.params, 'sort_type', '');
 	res.redirect(linkIndex)
 });	
+
+// changeparentmenu
+
+router.post('/changeparentmenu',
+	body('id')
+				.custom(async (val, {req}) => {
+				return await schemaMenu.findOne({_id: val}).then(async user => {
+					console.log(user)
+					if (!user) {
+						return Promise.reject(notify.ERROR_NOT_EXITS)
+					}
+					return
+				})}),
+	body('newParent')
+				.custom(async (val, {req}) => {
+				if(val == 'parentmenu') return
+				return await schemaMenu.findOne({_id: val}).then(async user => {
+					console.log(user)
+					if (!user) {
+						return Promise.reject(notify.ERROR_NOT_EXITS)
+					}
+					return
+				})}),
+	async (req, res, next) => {
+		try {
+			const errors = validationResult(req);
+			if (! errors.isEmpty()) {
+				res.send({success: false, errors: errors})
+				return
+			} else{
+				let {newParent, id} = req.body
+				await schemaMenu.updateOne({_id: id}, {parentMenu: newParent})
+				res.send({success: true})
+			}
+		} catch (error) {
+			console.log(error)
+			res.send({success: false})
+		}
+});
 
 
 

@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
     slug: String,
     status: String,
     ordering: Number,
-    parentId: String,
+    parentmenu: String,
  },
  { timestamps: true }
  );
